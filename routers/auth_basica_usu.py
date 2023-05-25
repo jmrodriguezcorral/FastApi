@@ -1,8 +1,10 @@
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 from fastapi.security import OAuth2PasswordBearer,OAuth2PasswordRequestForm
 
-app = FastAPI()
+router = APIRouter(prefix="/usu_auth_basico",
+                   tags=["usu auth basico"],
+                   responses={status.HTTP_404_NOT_FOUND: {"message": "No encontrado"}})
 
 # La clase se encarga de controlar la seguridad. La instaciamos y le decimos
 # que URL tendra el control de solicitar usuario y cotraseña
@@ -66,7 +68,7 @@ async def usuario_actual(token: str = Depends(oauth2)):
                             )
     return usuario
     
-@app.post("/login")
+@router.post("/login")
 async def login(formulario: OAuth2PasswordRequestForm = Depends()):
     # La clase OAuth2PasswordRequestForm nos proporciona un formulario por defecto para recoger datos de usuario
 
@@ -88,7 +90,7 @@ async def login(formulario: OAuth2PasswordRequestForm = Depends()):
     # En caso de tener exito (no ha saltado ninguna excepcion) se devulve un token. JSON predefinido
     return {"access_token": usuario.username,"token_type":"bearer"}
 
-@app.get("/usuario/yo")
+@router.get("/usuario/yo")
 async def yo(usuario: User = Depends(usuario_actual)):
     return usuario
 
