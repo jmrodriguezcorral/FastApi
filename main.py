@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routers import productos,usuarios,auth_basica_usu,auth_jwt_usu
+from routers import productos,usuarios,auth_basica_usu,auth_jwt_usu,usuarios_bd
 from fastapi.staticfiles import StaticFiles
 
 
@@ -12,6 +12,7 @@ app.include_router(productos.router)
 app.include_router(usuarios.router)
 app.include_router(auth_basica_usu.router)
 app.include_router(auth_jwt_usu.route)
+app.include_router(usuarios_bd.router)
 
 
 #Contenido estatico
