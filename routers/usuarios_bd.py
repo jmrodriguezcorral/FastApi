@@ -13,7 +13,7 @@ router = APIRouter(prefix="/usu_db",
 #listas los usuarios
 @router.get("/", response_model=list[User])
 async def usuarios():
-    return usuarios_schema(db_cliente.local.usuarios.find()) 
+    return usuarios_schema(db_cliente.usuarios.find()) 
 
 @router.get("/{id}") #Acceso por path
 async def usuario(id: str):
@@ -21,7 +21,6 @@ async def usuario(id: str):
 
 @router.get("/query/") #Acceso por query
 async def usuario(id: str):
-    print("hola")
     return buscarUsuario("_id",ObjectId(id))
 
 @router.post("/",response_model=User,status_code=status.HTTP_201_CREATED)
@@ -31,8 +30,8 @@ async def usuario(usu:User):
 
     usu_dic = dict(usu)
     del usu_dic["id"]
-    id = db_cliente.local.usuarios.insert_one(usu_dic).inserted_id
-    usu_nuevo = usuario_schema(db_cliente.local.usuarios.find_one({"_id":id}))
+    id = db_cliente.usuarios.insert_one(usu_dic).inserted_id
+    usu_nuevo = usuario_schema(db_cliente.usuarios.find_one({"_id":id}))
     return User(**usu_nuevo)
 
 # Prueba de PUT. Actualizar los valores de un usuario
@@ -42,7 +41,7 @@ async def usuario(usu:User):
     usu_dict = dict(usu)
     del usu_dict["id"]
     try:
-        db_cliente.local.usuarios.find_one_and_replace(
+        db_cliente.usuarios.find_one_and_replace(
             {"_id": ObjectId(usu.id)}, 
             usu_dict)
     except:
@@ -53,7 +52,7 @@ async def usuario(usu:User):
 #Prueba de DELETE. Se borra un usuario de la lista
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT) #Acceso por path
 async def usuario(id: str):
-    esta = db_cliente.local.usuarios.find_one_and_delete({"_id": ObjectId(id)})
+    esta = db_cliente.usuarios.find_one_and_delete({"_id": ObjectId(id)})
     
     if not esta:
         return {"error":"No se ha borra. No estaba"}
@@ -64,7 +63,7 @@ async def usuario(id: str):
 def buscarUsuario_correo(correo: int):
     try:
         # Recupero el usuario de la BD por correo electronico
-        usu = db_cliente.local.usuarios.find_one({"correo": correo})
+        usu = db_cliente.usuarios.find_one({"correo": correo})
         return User(**usuario_schema(usu))
     except:
         return {"error":"elemento no encontrado"}
@@ -72,7 +71,7 @@ def buscarUsuario_correo(correo: int):
 def buscarUsuario(campo: str, valor):
     try:
         # Recupero el usuario de la BD por correo electronico
-        usu = db_cliente.local.usuarios.find_one({campo: valor})
+        usu = db_cliente.usuarios.find_one({campo: valor})
         return User(**usuario_schema(usu))
     except:
         return {"error":"elemento no encontrado"}
